@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      board_agent_threads: {
+        Row: {
+          ai_block: Json | null
+          board_id: string
+          created_at: string
+          id: string
+          messages: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_block?: Json | null
+          board_id: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_block?: Json | null
+          board_id?: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "board_agent_threads_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "boards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       board_characters: {
         Row: {
           board_id: string
@@ -181,6 +219,38 @@ export type Database = {
             foreignKeyName: "board_items_board_id_fkey"
             columns: ["board_id"]
             isOneToOne: false
+            referencedRelation: "boards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      board_video_projects: {
+        Row: {
+          board_id: string
+          clips: Json
+          created_at: string
+          revision: number
+          updated_at: string
+        }
+        Insert: {
+          board_id: string
+          clips?: Json
+          created_at?: string
+          revision?: number
+          updated_at?: string
+        }
+        Update: {
+          board_id?: string
+          clips?: Json
+          created_at?: string
+          revision?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "board_video_projects_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: true
             referencedRelation: "boards"
             referencedColumns: ["id"]
           },
