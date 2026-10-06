@@ -14,6 +14,113 @@ export type Database = {
   }
   public: {
     Tables: {
+      board_characters: {
+        Row: {
+          board_id: string
+          consistency_notes: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          reference_image_paths: string[]
+          updated_at: string
+          visual_traits: string
+        }
+        Insert: {
+          board_id: string
+          consistency_notes?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          reference_image_paths?: string[]
+          updated_at?: string
+          visual_traits?: string
+        }
+        Update: {
+          board_id?: string
+          consistency_notes?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          reference_image_paths?: string[]
+          updated_at?: string
+          visual_traits?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "board_characters_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "boards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      board_generation_runs: {
+        Row: {
+          board_id: string
+          character_id: string | null
+          created_at: string
+          error: string | null
+          id: string
+          inputs: Json
+          kind: string
+          model: string
+          output_path: string | null
+          prompt: string
+          provider_job_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          board_id: string
+          character_id?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          inputs?: Json
+          kind: string
+          model: string
+          output_path?: string | null
+          prompt?: string
+          provider_job_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          board_id?: string
+          character_id?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          inputs?: Json
+          kind?: string
+          model?: string
+          output_path?: string | null
+          prompt?: string
+          provider_job_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "board_generation_runs_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "boards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "board_generation_runs_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "board_characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       board_items: {
         Row: {
           board_id: string
