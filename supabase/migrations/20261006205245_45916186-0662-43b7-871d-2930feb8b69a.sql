@@ -1,0 +1,14 @@
+CREATE TABLE public.board_video_projects (board_id uuid PRIMARY KEY REFERENCES public.boards(id) ON DELETE CASCADE, clips jsonb NOT NULL DEFAULT '[]'::jsonb, revision integer NOT NULL DEFAULT 0, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.board_video_projects TO authenticated;
+GRANT ALL ON public.board_video_projects TO service_role;
+ALTER TABLE public.board_video_projects ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Board owners manage video timelines" ON public.board_video_projects FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.boards b WHERE b.id = board_id AND b.user_id = auth.uid())) WITH CHECK (EXISTS (SELECT 1 FROM public.boards b WHERE b.id = board_id AND b.user_id = auth.uid()));
+CREATE TABLE public.board_agent_threads (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), board_id uuid NOT NULL REFERENCES public.boards(id) ON DELETE CASCADE, title text NOT NULL DEFAULT 'New edit', messages jsonb NOT NULL DEFAULT '[]'::jsonb, ai_block jsonb, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.board_agent_threads TO authenticated;
+GRANT ALL ON public.board_agent_threads TO service_role;
+ALTER TABLE public.board_agent_threads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Board owners manage agent conversations" ON public.board_agent_threads FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.boards b WHERE b.id = board_id AND b.user_id = auth.uid())) WITH CHECK (EXISTS (SELECT 1 FROM public.boards b WHERE b.id = board_id AND b.user_id = auth.uid()));
+CREATE INDEX board_agent_threads_board_idx ON public.board_agent_threads(board_id, updated_at DESC);
+CREATE OR REPLACE FUNCTION public.touch_video_studio_updated_at() RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
+CREATE TRIGGER touch_board_video_projects BEFORE UPDATE ON public.board_video_projects FOR EACH ROW EXECUTE FUNCTION public.touch_video_studio_updated_at();
+CREATE TRIGGER touch_board_agent_threads BEFORE UPDATE ON public.board_agent_threads FOR EACH ROW EXECUTE FUNCTION public.touch_video_studio_updated_at();
