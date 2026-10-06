@@ -1,29 +1,31 @@
+# Character-consistent AI canvas studio
 
+## Goal
+Evolve the existing visual canvas into a character-first creation studio, while keeping provider/model choices limited to integrations verified in the live workspace catalog. Add a canvas command bar and a terminal CLI, with an orchestrated workflow for image/video creation and editing.
 
-## Add 6 new landing page images in an outer ring
+## Scope
+- Make characters persistent canvas entities: reference image(s), name/description, visual traits, and reusable consistency notes that are automatically updated from user-approved generation outcomes.
+- Add an in-canvas command bar supporting image generation, video generation, reference-guided edits, prompt optimization, style transfer, and supported image enhancement/removal/VFX actions. Results become canvas items and retain links to source/reference character context.
+- Add generation orchestration with explicit steps/statuses, inputs, selected supported model, cancellation/error reporting, and history on the canvas.
+- Add an agent/context layer that can summarize a board and propose updates to its living character/style context; changes remain reviewable and user-approved rather than silently rewriting identity.
+- Provide a separate terminal CLI that targets the same supported command workflow, with documented install/configuration and commands for generation and board context operations.
+- Use verified gateway integrations: `openai/gpt-6-astra`, `openai/gpt-image-2.5-sunburst`, `anthropic/claude-fable-5-1`, supported Gemini image models, and `google/veo-3.1` variants. Check each model's endpoint requirements before implementation.
+- Do not list unsupported provider requests as usable models: Seedream 5.0, Seedance 2.5, Wan 3, Flux, LTX, and GPT-2. External providers may be added later only after an available connector or credentials exist.
 
-### Steps
+## Implementation approach
+- Preserve the existing TanStack Start app and Konva canvas; add the studio controls as focused canvas UI.
+- Keep gateway calls and orchestration server-side, stream requests, and use the existing Lovable Cloud auth/storage patterns. Do not use Supabase Edge Functions for new internal server logic.
+- Build the CLI as a small, separately invokable package/script that calls an authenticated app API; never put gateway secrets in browser or CLI source.
+- Confirm which enhancement operations have a verified provider endpoint; present unsupported operations as unavailable rather than simulating their completion.
 
-1. **Create 6 asset files** — Upload each of the 6 new images via `assets--create_asset` to `src/assets/landing-8.jpeg` through `src/assets/landing-13.jpeg`.
+## Acceptance checks
+- Existing canvas editing, upload, and board flow remain intact.
+- A character can be defined and reused as context for multiple generations; its context can be reviewed and updated.
+- Users can initiate image/video work through the canvas command bar and the terminal CLI.
+- Only verified model identifiers are selectable, and unsupported providers are clearly absent/unavailable.
+- Generation failures, permissions, progress, and cancellation are visible and do not lose partial results.
 
-2. **Update `src/routes/index.tsx`** — Add 6 new imports and 6 new entries to `DEMO_IMAGES` with positions further from center than the existing ring. Approximate positions for the outer scatter:
-
-```text
-Existing range: roughly x: -700 to +500, y: -510 to +410
-New images placed at x: -900 to +750, y: -650 to +600
-```
-
-Proposed positions (will use varied sizes similar to existing images):
-- id 8: x: -920, y: -500, ~260x260 (fashion couple — top-left outer)
-- id 9: x: 650, y: -500, ~280x280 (abstract orange — top-right outer)
-- id 10: x: -880, y: 350, ~290x290 (woman laptop — bottom-left outer)
-- id 11: x: 600, y: 400, ~250x330 (man boxes — bottom-right outer)
-- id 12: x: -350, y: -700, ~270x400 (water lilies — top-center outer)
-- id 13: x: 450, y: 500, ~240x400 (fashion crosswalk — bottom-right far)
-
-### Technical details
-
-- **Files changed**: `src/routes/index.tsx` only (plus 6 new `.asset.json` files created by the asset tool)
-- No database or backend changes needed
-- Images will be visible on larger screens when users pan or zoom slightly; they sit just outside the initial viewport ring
-
+## Technical details
+- Current gateway support confirmed: GPT-6 Astra, GPT Image 2.5 Sunburst, Claude Fable 5.1, Gemini image models including Gemini 3 Pro Image, and Veo 3.1 variants.
+- Video generation uses the gateway video job interface, not chat/image endpoints. OpenAI Responses calls must follow the project gateway contract; Claude uses native Messages. Image and video outputs need verified storage/asset persistence paths.
+- Upscaling, background removal, and generalized VFX are not established as available operations from the current model catalog; implementation must verify available endpoints before exposing them as functional actions.
